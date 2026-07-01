@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --line: rgba(242, 231, 218, 0.14);
+  --line-strong: rgba(242, 231, 218, 0.28);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #221619;
+  color: #f2e7da;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*:focus-visible {
+  outline: 2px solid #c6a15b;
+  outline-offset: 2px;
+}
+
+/* Petits utilitaires réutilisés */
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #c6a15b;
+  font-weight: 600;
+}
+
+.border-line { border-color: var(--line); }
+.border-line-strong { border-color: var(--line-strong); }
+
+/* Barre de défilement discrète dans le panier */
+.drawer-scroll::-webkit-scrollbar { width: 6px; }
+.drawer-scroll::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
