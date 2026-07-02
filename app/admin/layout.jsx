@@ -19,6 +19,7 @@ export default function AdminLayout({ children }) {
               <span className="text-ivory-soft text-sm hidden sm:inline">Espace boutique</span>
             </div>
             <div className="flex items-center gap-4">
+              <Link href="/admin/orders" className="text-ivory-soft hover:text-ivory text-sm">Commandes</Link>
               <Link href="/" className="text-ivory-soft hover:text-ivory text-sm">Voir la boutique ↗</Link>
               <SignOutButton />
             </div>

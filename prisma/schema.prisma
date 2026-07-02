@@ -17,9 +17,12 @@ model Product {
   noteTop     String?
   noteHeart   String?
   noteBase    String?
+  stock       Int      @default(0)
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  orderItems  OrderItem[]
 }
 
 model User {
@@ -28,4 +31,43 @@ model User {
   name      String?
   password  String // haché avec bcrypt
   createdAt DateTime @default(now())
+}
+
+enum OrderStatus {
+  pending
+  paid
+  failed
+  cancelled
+}
+
+model Order {
+  id               Int         @id @default(autoincrement())
+  reference        String      @unique
+  customerName     String
+  customerPhone    String
+  customerAddress  String      @db.Text
+  paymentMethod    String
+  total            Int // en FCFA
+  status           OrderStatus @default(pending)
+  paydunyaToken    String?     @unique
+  paidAt           DateTime?
+  stockDecremented Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  items            OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   Int
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId Int?
+  name      String // snapshot du nom au moment de la commande
+  price     Int // snapshot du prix unitaire FCFA au moment de la commande
+  qty       Int
+
+  @@index([orderId])
+  @@index([productId])
 }

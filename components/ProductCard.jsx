@@ -39,12 +39,18 @@ export default function ProductCard({ product, liquid }) {
           {product.price.toLocaleString("fr-FR")}
           <span className="text-xs text-ivory-soft font-sans"> FCFA · 50ml</span>
         </span>
-        <button
-          onClick={() => addToCart(product)}
-          className="border border-line-strong hover:bg-gold hover:border-gold hover:text-ink text-ivory px-5 py-2.5 rounded-full text-[13px] tracking-wide transition"
-        >
-          Ajouter
-        </button>
+        {product.stock > 0 ? (
+          <button
+            onClick={() => addToCart(product)}
+            className="border border-line-strong hover:bg-gold hover:border-gold hover:text-ink text-ivory px-5 py-2.5 rounded-full text-[13px] tracking-wide transition"
+          >
+            Ajouter
+          </button>
+        ) : (
+          <span className="border border-line-strong text-ivory-soft px-5 py-2.5 rounded-full text-[13px] tracking-wide">
+            Épuisé
+          </span>
+        )}
       </div>
     </article>
   );

@@ -29,6 +29,7 @@ function parseData(formData) {
     family: formData.get("family")?.trim(),
     price: parseInt(formData.get("price"), 10) || 0,
     description: formData.get("description")?.trim() || "",
+    stock: parseInt(formData.get("stock"), 10) || 0,
     noteTop: formData.get("noteTop")?.trim() || null,
     noteHeart: formData.get("noteHeart")?.trim() || null,
     noteBase: formData.get("noteBase")?.trim() || null,
@@ -36,9 +37,20 @@ function parseData(formData) {
   };
 }
 
+function validateProductData(data) {
+  const errors = [];
+  if (!data.name) errors.push("Le nom est requis.");
+  if (!data.family) errors.push("La famille est requise.");
+  if (!data.description) errors.push("La description est requise.");
+  if (!Number.isInteger(data.price) || data.price <= 0) errors.push("Le prix doit être un entier positif.");
+  if (!Number.isInteger(data.stock) || data.stock < 0) errors.push("Le stock doit être un entier positif ou nul.");
+  if (errors.length) throw new Error(errors.join(" "));
+}
+
 export async function createProduct(formData) {
   await requireAuth();
   const data = parseData(formData);
+  validateProductData(data);
   const imageUrl = await handleImage(formData);
   await prisma.product.create({ data: { ...data, imageUrl } });
   revalidatePath("/");
@@ -49,6 +61,7 @@ export async function createProduct(formData) {
 export async function updateProduct(id, formData) {
   await requireAuth();
   const data = parseData(formData);
+  validateProductData(data);
   const existing = await prisma.product.findUnique({ where: { id: Number(id) } });
   const imageUrl = await handleImage(formData, existing?.imageUrl || null);
   await prisma.product.update({ where: { id: Number(id) }, data: { ...data, imageUrl } });

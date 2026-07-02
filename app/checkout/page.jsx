@@ -1,44 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { formatFCFA } from "@/lib/format";
+import { createOrder } from "./actions";
 
 const PAYMENTS = ["Wave", "Orange Money", "PayDunya"];
 
 export default function CheckoutPage() {
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal } = useCart();
   const [payment, setPayment] = useState("Wave");
-  const [done, setDone] = useState(false);
-  const [order, setOrder] = useState("");
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
+  const [error, setError] = useState(null);
+  const [pending, startTransition] = useTransition();
 
   const submit = (e) => {
     e.preventDefault();
-    setOrder("SLG-" + Math.floor(100000 + Math.random() * 900000));
-    setDone(true);
-    clearCart();
+    setError(null);
+    startTransition(async () => {
+      const result = await createOrder({
+        customerName: form.name,
+        customerPhone: form.phone,
+        customerAddress: form.address,
+        paymentMethod: payment,
+        items: items.map(({ product, qty }) => ({ productId: product.id, qty })),
+      });
+      if (result.error) setError(result.error);
+      else window.location.href = result.redirectUrl;
+    });
   };
-
-  if (done) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
-          <div className="w-[66px] h-[66px] rounded-full border border-gold text-gold flex items-center justify-center text-3xl mx-auto mb-6">✓</div>
-          <h1 className="font-serif font-normal text-[32px] mb-3">Commande confirmée</h1>
-          <p className="text-ivory-soft mb-2">Votre commande a bien été enregistrée.</p>
-          <p className="text-gold tracking-[0.1em] text-lg mb-4">{order}</p>
-          <p className="text-ivory-soft mb-8">
-            Vous recevrez un SMS de confirmation pour le paiement via {payment}.
-          </p>
-          <Link href="/" className="inline-block bg-gold hover:bg-[#d4b16e] text-ink px-8 py-3.5 rounded-full font-semibold transition">
-            Retour à la boutique
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-[880px] mx-auto px-7 py-16">
@@ -87,8 +78,11 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            <button type="submit" className="w-full bg-gold hover:bg-[#d4b16e] text-ink py-4 rounded-full font-semibold text-[15px] tracking-wide transition">
-              Payer {formatFCFA(subtotal)}
+            {error && <p className="text-rose text-sm mb-4">{error}</p>}
+
+            <button type="submit" disabled={pending}
+              className="w-full bg-gold hover:bg-[#d4b16e] disabled:opacity-50 text-ink py-4 rounded-full font-semibold text-[15px] tracking-wide transition">
+              {pending ? "Redirection vers le paiement…" : `Payer ${formatFCFA(subtotal)}`}
             </button>
           </form>
 

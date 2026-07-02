@@ -11,6 +11,8 @@ export function CartProvider({ children }) {
   const addToCart = useCallback((product) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
+      const currentQty = existing?.qty || 0;
+      if (currentQty + 1 > product.stock) return prev;
       if (existing)
         return prev.map((i) =>
           i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i
@@ -23,7 +25,11 @@ export function CartProvider({ children }) {
   const changeQty = useCallback((id, delta) => {
     setItems((prev) =>
       prev
-        .map((i) => (i.product.id === id ? { ...i, qty: i.qty + delta } : i))
+        .map((i) =>
+          i.product.id === id
+            ? { ...i, qty: Math.min(i.qty + delta, i.product.stock) }
+            : i
+        )
         .filter((i) => i.qty > 0)
     );
   }, []);

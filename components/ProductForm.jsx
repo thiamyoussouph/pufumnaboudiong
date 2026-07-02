@@ -25,7 +25,7 @@ export default function ProductForm({ action, product }) {
       // action fait redirect() vers /admin
     } catch (err) {
       setSaving(false);
-      alert("Une erreur est survenue. Vérifiez les champs et réessayez.");
+      alert(err.message || "Une erreur est survenue. Vérifiez les champs et réessayez.");
     }
   };
 
@@ -51,10 +51,17 @@ export default function ProductForm({ action, product }) {
           </div>
           <div>
             <label className="block text-xs tracking-[0.1em] uppercase text-ivory-soft mb-2">Prix (FCFA) *</label>
-            <input name="price" required type="number" min="0" defaultValue={product?.price}
+            <input name="price" required type="number" min="1" defaultValue={product?.price}
               placeholder="45000"
               className="w-full bg-surface border border-line-strong focus:border-gold outline-none text-ivory px-4 py-3 rounded-[10px]" />
           </div>
+        </div>
+
+        <div className="mb-5">
+          <label className="block text-xs tracking-[0.1em] uppercase text-ivory-soft mb-2">Stock disponible *</label>
+          <input name="stock" required type="number" min="0" defaultValue={product?.stock ?? 0}
+            placeholder="20"
+            className="w-full bg-surface border border-line-strong focus:border-gold outline-none text-ivory px-4 py-3 rounded-[10px]" />
         </div>
 
         <div className="mb-5">
